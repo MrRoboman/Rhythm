@@ -1,6 +1,4 @@
-let filter, filterFreq, filterRes
-let fft
-
+let rhythm
 let song
 let songNames = [
     '../_sound/youtube/billiejean_trim.mp3',
@@ -10,116 +8,101 @@ let songNames = [
     '../_sound/again/Again_Again_part4.wav',
 ]
 
-// let bpm = 116 // Billie Jean
-// let beatSeconds = bpm / 60
-// beatSeconds /= 4
-// let beatInverse = 1 / beatSeconds
+let positions
+
+class Rhythm {
+    constructor(song, bpm) {
+        this.setSong(song)
+        this.setBpm(bpm)
+    }
+
+    setSong(song) {
+        this.song = song
+    }
+
+    setBpm(bpm) {
+        this.bpm = bpm
+        this.beatSeconds = 60 / bpm
+    }
+
+    currentBeat() {
+        return Math.floor(this.song.currentTime() / this.beatSeconds)
+    }
+
+    quarterProgress() {
+        let beat = this.currentBeat()
+        const curBeatTime = this.beatSeconds * beat
+        const nextBeatTime = this.beatSeconds * (beat + 1)
+        return map(this.song.currentTime(), curBeatTime, nextBeatTime, 0, 1)
+    }
+}
 
 function preload() {
     song = loadSound(songNames[0])
-
-    createVar('bpm', 116.6, 'slider', 50, 150)
-    // createVar('beatSeconds', 0.5172413793103449, 'slider', 0, 1, 0.001)
-    createVar('beatSeconds', 60 / getVar('bpm'), 'slider', 0, 1, 0.001)
-    // setVar('beatSeconds', getVar('beatSeconds') / 4)
+    createVar('bpm', 116.7, 'slider', 50, 150)
 }
 
 function setup() {
     createCanvas(600, 600).parent('#canvas')
+    rhythm = new Rhythm(song, 116.6)
     song.play()
-    // song.jump(50)
-    // song.loop()
-    filter = new p5.LowPass()
-    // song.disconnect()
-    // song.connect(filter)
-    fft = new p5.FFT()
+    positions = [createVector(0, 0), createVector(width - 100, 0)]
 }
 
 function draw() {
     background(0)
     fill(255)
-    background(30)
 
-    // Map mouseX to a the cutoff frequency from the lowest
-    // frequency (10Hz) to the highest (22050Hz) that humans can hear
-    // filterFreq = map(mouseX, 0, width, 10, 22050)
-
-    // // Map mouseY to resonance (volume boost) at the cutoff frequency
-    // filterRes = map(mouseY, 0, height, 15, 5)
-
-    // // set filter parameters
-    // filter.set(filterFreq, filterRes)
-
-    // // Draw every value in the soundFile spectrum analysis where
-    // // x = lowest (10Hz) to highest (22050Hz) frequencies,
-    // // h = energy (amplitude / volume) at that frequency
-    // let spectrum = fft.analyze()
-    // noStroke()
-    // for (let i = 0; i < spectrum.length; i++) {
-    //     let x = map(i, 0, spectrum.length, 0, width)
-    //     let h = -height + map(spectrum[i], 0, 255, height, 0)
-    //     rect(x, height, width / spectrum.length, h)
-    // }
-
-    let padding = 10
-    let beat = getCurrentBeat()
-    switch (beat % 4) {
-        case 0:
-            rect(
-                padding,
-                padding,
-                width / 2 - padding * 2,
-                height / 2 - padding * 2,
-            )
-            break
-        case 1:
-            rect(
-                width / 2 + padding,
-                padding,
-                width / 2 - padding * 2,
-                height / 2 - padding * 2,
-            )
-            break
-        case 2:
-            rect(
-                width / 2 + padding,
-                height / 2 + padding,
-                width / 2 - padding * 2,
-                height / 2 - padding * 2,
-            )
-            break
-        case 3:
-            rect(
-                padding,
-                height / 2 + padding,
-                width / 2 - padding * 2,
-                height / 2 - padding * 2,
-            )
-            break
+    // console.log(rhythm.quarterProgress())
+    // let padding = 10
+    let beat = rhythm.currentBeat()
+    let from, to
+    if (beat % 2 === 0) {
+        from = positions[0]
+        to = positions[1]
+    } else {
+        from = positions[1]
+        to = positions[0]
     }
-}
-
-function getCurrentBeat() {
-    let beatSeconds = 60 / getVar('bpm')
-    // beatSeconds /= 4
-    // let beatInverse = 1 / beatSeconds
-    // console.log(
-    //     Math.floor(song.currentTime() * beatInverse) ===
-    //         Math.floor(song.currentTime() / beatSeconds),
-    // )
-    return Math.floor(song.currentTime() / beatSeconds)
-}
-
-let taps = []
-function mouseClicked() {
-    // taps.push(song.currentTime())
-    // if (taps.length < 2) return
-    // if (taps.length > 2) {
-    //     taps.splice(0, 1)
+    let prog = rhythm.quarterProgress()
+    prog = Expo.easeIn(prog)
+    let pos = p5.Vector.lerp(from, to, prog)
+    // let x = map(prog, 0, 1, 0, width - 100)
+    rect(pos.x, height / 2 - 50, 100, 100)
+    // switch (beat % 4) {
+    //     case 0:
+    //         rect(
+    //             padding,
+    //             padding,
+    //             width / 2 - padding * 2,
+    //             height / 2 - padding * 2,
+    //         )
+    //         break
+    //     case 1:
+    //         rect(
+    //             width / 2 + padding,
+    //             padding,
+    //             width / 2 - padding * 2,
+    //             height / 2 - padding * 2,
+    //         )
+    //         break
+    //     case 2:
+    //         rect(
+    //             width / 2 + padding,
+    //             height / 2 + padding,
+    //             width / 2 - padding * 2,
+    //             height / 2 - padding * 2,
+    //         )
+    //         break
+    //     case 3:
+    //         rect(
+    //             padding,
+    //             height / 2 + padding,
+    //             width / 2 - padding * 2,
+    //             height / 2 - padding * 2,
+    //         )
+    //         break
     // }
-    // let beatSeconds = taps[1] - taps[0]
-    // setVar('beatSeconds', beatSeconds)
-    // console.log(beatSeconds)
 }
 
 function keyPressed(event) {
