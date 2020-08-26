@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Art</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.min.js"></script>
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/addons/p5.sound.min.js"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.4.2/gsap.min.js"></script>
+        <script src="../_global/p5.sound.min.js"></script>
+        <script src="../_global/jscolor.js"></script>
+        <script src="../_global/control.js"></script>
+        <script src="index.js"></script>
+        <style>
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            #canvas {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                margin: 10px;
+            }
+            .panel {
+                margin: 16px;
+            }
+            input[type='text'] {
+                margin: 0px 10px;
+                width: 60px;
+            }
+            #controls {
+                display: grid;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="canvas"></div>
+        <div class="panel">
+            <button id="undoButton">Undo</button>
+            <button id="redoButton">Redo</button>
+            <button id="defaultsButton">Defaults</button>
+            <button id="saveButton">Save</button>
+        </div>
+        <div id="song" class="panel">
+            <button id="playButton">Play</button>
+        </div>
+        <div id="controls"></div>
+        <div id="versions" class="panel"></div>
+    </body>
+</html>
