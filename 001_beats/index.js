@@ -8,7 +8,7 @@ let songNames = [
     '../_sound/again/Again_Again_part4.wav',
 ]
 
-let positions
+let size
 
 function preload() {
     song = loadSound(songNames[0])
@@ -16,10 +16,10 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(600, 600).parent('#canvas')
+    createCanvas(400, 400).parent('#canvas')
     rhythm = new Rhythm(song, getVar('bpm'))
+    size = height / rhythm.beatSeconds.length
     song.play()
-    positions = [createVector(0, 0), createVector(width - 100, 0)]
 }
 
 function draw() {
@@ -28,19 +28,20 @@ function draw() {
     rhythm.setBpm(getVar('bpm'))
 
     let from, to
-    let timing = Rhythm.QUARTER
-    let beat = rhythm.getBeat(timing)
-    if (beat % 2 === 0) {
-        from = positions[0]
-        to = positions[1]
-    } else {
-        from = positions[1]
-        to = positions[0]
-    }
-    let prog = rhythm.getBeatProgress(timing)
-    prog = Power4.easeIn(prog)
-    let pos = p5.Vector.lerp(from, to, prog)
-    rect(pos.x, height / 2 - 50, 100, 100)
+    rhythm.beatSeconds.forEach((_, i) => {
+        let beat = rhythm.getBeat(i)
+        if (beat % 2 === 0) {
+            from = createVector(0, size * i)
+            to = createVector(width - size, size * i)
+        } else {
+            from = createVector(width - size, size * i)
+            to = createVector(0, size * i)
+        }
+        let prog = rhythm.getBeatProgress(i)
+        // prog = Power4.easeIn(prog)
+        let pos = p5.Vector.lerp(from, to, prog)
+        rect(pos.x, pos.y, size, size)
+    })
 }
 
 function keyPressed(event) {
