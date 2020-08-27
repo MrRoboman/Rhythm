@@ -5,10 +5,11 @@ class Rhythm {
     static EIGHTH = 3
     static SIXTEENTH = 4
 
-    constructor(song, bpm) {
+    constructor(song, bpm, offset = 0) {
         this.beatSeconds = [0, 0, 0, 0, 0]
         this.setSong(song)
         this.setBpm(bpm)
+        this.setOffset(offset)
     }
 
     setSong(song) {
@@ -26,8 +27,16 @@ class Rhythm {
         }
     }
 
+    setOffset(seconds) {
+        this.offset = seconds
+    }
+
+    getCurrentTime() {
+        return max(0, this.song.currentTime() - this.offset)
+    }
+
     getBeat(timing) {
-        return Math.floor(this.song.currentTime() / this.beatSeconds[timing])
+        return Math.floor(this.getCurrentTime() / this.beatSeconds[timing])
     }
 
     getBeatProgress(timing) {
@@ -35,6 +44,6 @@ class Rhythm {
         let beatSeconds = this.beatSeconds[timing]
         const curBeatStart = beatSeconds * beat
         const nextBeatStart = beatSeconds * (beat + 1)
-        return map(this.song.currentTime(), curBeatStart, nextBeatStart, 0, 1)
+        return map(this.getCurrentTime(), curBeatStart, nextBeatStart, 0, 1)
     }
 }

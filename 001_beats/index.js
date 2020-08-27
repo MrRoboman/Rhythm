@@ -1,31 +1,40 @@
 let rhythm
 let song
-let songNames = [
-    '../_sound/youtube/billiejean_trim.mp3',
-    '../_sound/again/Again_Again_part1.wav',
-    '../_sound/again/Again_Again_part2.wav',
-    '../_sound/again/Again_Again_part3.wav',
-    '../_sound/again/Again_Again_part4.wav',
-]
+let songNames = ['../_sound/youtube/billiejean.mp3']
 
 let size
+let offset = 1.494
 
 function preload() {
     song = loadSound(songNames[0])
-    createVar('bpm', 116.0, 'slider', 50, 150)
+}
+
+function setupEventListeners() {
+    document
+        .getElementById('playButton')
+        .addEventListener('click', onClickPlayButton)
+    document
+        .getElementById('backButton')
+        .addEventListener('click', onBackFiveSecs)
+    document
+        .getElementById('forwardButton')
+        .addEventListener('click', onForwardFiveSecs)
 }
 
 function setup() {
+    setupEventListeners()
     createCanvas(400, 400).parent('#canvas')
+    createVar('bpm', 116.5, 'slider', 50, 150)
+    createVar('offset', offset, 'slider', 0, 3, 0.001)
     rhythm = new Rhythm(song, getVar('bpm'))
     size = height / rhythm.beatSeconds.length
-    song.play()
 }
 
 function draw() {
     background(0)
     fill(255)
     rhythm.setBpm(getVar('bpm'))
+    rhythm.setOffset(getVar('offset'))
 
     let from, to
     rhythm.beatSeconds.forEach((_, i) => {
@@ -44,11 +53,21 @@ function draw() {
     })
 }
 
-function keyPressed(event) {
-    if (event.keyCode === LEFT_ARROW) {
-        song.jump(song.currentTime() - 5)
+function onClickPlayButton() {
+    if (song.isPlaying()) {
+        song.stop()
+    } else {
+        song.play()
+        song.jump(offset - 0.3)
     }
-    if (event.keyCode === RIGHT_ARROW) {
-        song.jump(song.currentTime() + 5)
-    }
+}
+
+function onBackFiveSecs() {
+    const newTime = max(0, song.currentTime() - 5)
+    song.jump(newTime)
+}
+
+function onForwardFiveSecs() {
+    const newTime = min(song.duration(), song.currentTime() + 5)
+    song.jump(newTime)
 }
